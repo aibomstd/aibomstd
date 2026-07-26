@@ -1,0 +1,397 @@
+
+{
+  "aibomstd": {
+    "specVersion": "0.1",
+    "schema": "https://aibomstd.com/schema/v0.1/aibomstd.schema.json",
+    "serialNumber": "urn:uuid:f47ac10b-58cc-4372-a567-0e02b2c3d479",
+    "generated": "2026-01-15T10:30:00Z",
+
+    "tool": {
+      "name": "aibomstd-cli",
+      "version": "0.1.0",
+      "vendor": "Chola AI"
+    },
+
+    "subject": {
+      "name": "customer-support-ai",
+      "version": "2.1.0",
+      "type": "repository",
+      "source": "github.com/acme-corp/customer-support-ai",
+      "digest": {
+        "algorithm": "sha256",
+        "value": "a3f9c2b1d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1"
+      }
+    },
+
+    "components": [
+
+      {
+        "bom-ref": "model-001",
+        "type": "model",
+        "identity": {
+          "name": "llama-3-8b-instruct",
+          "provider": "meta",
+          "version": "3.0",
+          "model-id": "meta-llama/Meta-Llama-3-8B-Instruct",
+          "source": "huggingface",
+          "purl": "pkg:huggingface/meta-llama/Meta-Llama-3-8B-Instruct@3.0",
+          "uri": "https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct",
+          "digest": {
+            "algorithm": "sha256",
+            "value": "b7d3e1f2a4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1"
+          }
+        },
+        "provenance": {
+          "training-datasets": [
+            {
+              "name": "CommonCrawl",
+              "uri": "https://commoncrawl.org",
+              "verified": true,
+              "sensitivity": "public"
+            },
+            {
+              "name": "C4",
+              "uri": "https://huggingface.co/datasets/allenai/c4",
+              "verified": true,
+              "sensitivity": "public"
+            }
+          ],
+          "fine-tuned": false,
+          "trained-by": "meta-ai-research",
+          "trained-on": "2024-04-18",
+          "citations": [
+            {
+              "title": "Meta Llama 3",
+              "url": "https://ai.meta.com/blog/meta-llama-3",
+              "type": "model-card",
+              "year": 2024
+            }
+          ]
+        },
+        "license": {
+          "id": "llama3",
+          "name": "Meta Llama 3 Community License",
+          "url": "https://llama.meta.com/llama3/license",
+          "osi-approved": false,
+          "risk": "medium",
+          "commercial-use": true,
+          "conditions": [
+            "attribution-required",
+            "no-use-above-700M-MAU-without-meta-permission"
+          ]
+        },
+        "properties": {
+          "architecture": "transformer",
+          "task": "text-generation",
+          "parameters": "8B",
+          "quantization": "Q4_K_M",
+          "format": "gguf",
+          "context-window": 8192
+        },
+        "risks": [
+          {
+            "id": "AIBOM-R001",
+            "type": "license",
+            "severity": "medium",
+            "description": "Non-OSI license. Commercial use permitted but conditions apply. Usage above 700M MAU requires separate Meta agreement.",
+            "recommendation": "Confirm MAU is below 700M threshold. If approaching limit obtain Meta commercial agreement.",
+            "regulation": "internal"
+          }
+        ]
+      },
+
+      {
+        "bom-ref": "model-002",
+        "type": "model",
+        "identity": {
+          "name": "support-intent-classifier-v3",
+          "provider": "internal",
+          "version": "3.1.2",
+          "source": "mlflow",
+          "uri": "mlflow://acme-mlflow/support-intent-classifier/3",
+          "digest": {
+            "algorithm": "sha256",
+            "value": "c9f2a4b3d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2"
+          }
+        },
+        "provenance": {
+          "training-datasets": [
+            {
+              "name": "acme-support-tickets-2023-2024",
+              "uri": "internal://data-lake/support/tickets/2023-2024",
+              "verified": false,
+              "sensitivity": "PII"
+            }
+          ],
+          "fine-tuned": true,
+          "base-model": {
+            "name": "distilbert-base-uncased",
+            "version": "1.0",
+            "provider": "huggingface",
+            "model-id": "distilbert/distilbert-base-uncased"
+          },
+          "trained-by": "acme-ml-platform-team",
+          "trained-on": "2025-09-15"
+        },
+        "license": {
+          "id": "internal",
+          "name": "ACME Internal Use Only",
+          "osi-approved": false,
+          "risk": "none",
+          "commercial-use": false
+        },
+        "properties": {
+          "architecture": "transformer",
+          "task": "text-classification",
+          "parameters": "66M",
+          "format": "pytorch",
+          "fine-tuned": true
+        },
+        "risks": [
+          {
+            "id": "AIBOM-R002",
+            "type": "data-sensitivity",
+            "severity": "high",
+            "description": "Model trained on customer support tickets containing PII. Training dataset lineage not verified.",
+            "recommendation": "Register training datasets in data governance catalog. Obtain DPO sign-off.",
+            "regulation": "GDPR"
+          },
+          {
+            "id": "AIBOM-R003",
+            "type": "provenance",
+            "severity": "medium",
+            "description": "Internal model not in enterprise model registry. No bias evaluation documented.",
+            "recommendation": "Register model in enterprise registry. Conduct bias evaluation.",
+            "regulation": "EU-AI-ACT"
+          }
+        ]
+      },
+
+      {
+        "bom-ref": "framework-001",
+        "type": "framework",
+        "identity": {
+          "name": "transformers",
+          "provider": "huggingface",
+          "version": "4.44.2",
+          "source": "pypi",
+          "purl": "pkg:pypi/transformers@4.44.2"
+        },
+        "license": {
+          "id": "Apache-2.0",
+          "osi-approved": true,
+          "risk": "none",
+          "commercial-use": true
+        },
+        "risks": []
+      },
+
+      {
+        "bom-ref": "framework-002",
+        "type": "framework",
+        "identity": {
+          "name": "langchain",
+          "provider": "langchain-ai",
+          "version": "0.2.16",
+          "source": "pypi",
+          "purl": "pkg:pypi/langchain@0.2.16"
+        },
+        "license": {
+          "id": "MIT",
+          "osi-approved": true,
+          "risk": "none",
+          "commercial-use": true
+        },
+        "risks": []
+      },
+
+      {
+        "bom-ref": "framework-003",
+        "type": "framework",
+        "identity": {
+          "name": "torch",
+          "provider": "pytorch",
+          "version": "2.4.0",
+          "source": "pypi",
+          "purl": "pkg:pypi/torch@2.4.0"
+        },
+        "license": {
+          "id": "BSD-3-Clause",
+          "osi-approved": true,
+          "risk": "none",
+          "commercial-use": true
+        },
+        "risks": []
+      },
+
+      {
+        "bom-ref": "api-client-001",
+        "type": "api-client",
+        "identity": {
+          "name": "openai",
+          "provider": "openai",
+          "version": "1.40.0",
+          "source": "pypi",
+          "purl": "pkg:pypi/openai@1.40.0",
+          "is-external": true
+        },
+        "service": {
+          "name": "OpenAI API",
+          "endpoint": "https://api.openai.com/v1",
+          "models-used": ["gpt-4o", "gpt-4o-mini", "text-embedding-3-small"],
+          "data-leaves-boundary": true,
+          "data-residency": "US",
+          "authenticated": true
+        },
+        "license": {
+          "id": "Apache-2.0",
+          "osi-approved": true,
+          "risk": "none",
+          "commercial-use": true
+        },
+        "risks": [
+          {
+            "id": "AIBOM-R004",
+            "type": "data-egress",
+            "severity": "high",
+            "description": "Customer data sent to OpenAI API. Processed in US jurisdiction. Customer PII may be included in prompts.",
+            "recommendation": "Implement PII scrubbing before prompt construction. Verify OpenAI DPA. Consider Azure OpenAI for EU data residency.",
+            "regulation": "GDPR"
+          }
+        ]
+      },
+
+      {
+        "bom-ref": "api-client-002",
+        "type": "api-client",
+        "identity": {
+          "name": "anthropic",
+          "provider": "anthropic",
+          "version": "0.34.0",
+          "source": "pypi",
+          "purl": "pkg:pypi/anthropic@0.34.0",
+          "is-external": true
+        },
+        "service": {
+          "name": "Anthropic API",
+          "endpoint": "https://api.anthropic.com",
+          "models-used": ["claude-3-5-sonnet-20241022"],
+          "data-leaves-boundary": true,
+          "data-residency": "US",
+          "authenticated": true
+        },
+        "license": {
+          "id": "MIT",
+          "osi-approved": true,
+          "risk": "none",
+          "commercial-use": true
+        },
+        "risks": [
+          {
+            "id": "AIBOM-R005",
+            "type": "data-egress",
+            "severity": "high",
+            "description": "Data sent to Anthropic API. US jurisdiction only.",
+            "recommendation": "Ensure PII scrubbing applies to this path. Verify Anthropic DPA.",
+            "regulation": "GDPR"
+          }
+        ]
+      },
+
+      {
+        "bom-ref": "dataset-001",
+        "type": "dataset",
+        "identity": {
+          "name": "acme-support-kb-v4",
+          "provider": "internal",
+          "version": "4.0",
+          "source": "internal",
+          "uri": "internal://knowledge-base/support/v4"
+        },
+        "license": {
+          "id": "internal",
+          "name": "ACME Internal Use Only",
+          "osi-approved": false,
+          "risk": "none",
+          "commercial-use": false
+        },
+        "properties": {
+          "format": "jsonl",
+          "records": 45000,
+          "language": "en",
+          "sensitivity": "internal",
+          "purpose": "retrieval-augmented-generation"
+        },
+        "risks": []
+      }
+
+    ],
+
+    "summary": {
+      "total-components": 7,
+      "by-type": {
+        "model": 2,
+        "dataset": 1,
+        "framework": 3,
+        "api-client": 2
+      },
+      "risk-score": "high",
+      "risk-counts": {
+        "critical": 0,
+        "high": 3,
+        "medium": 2,
+        "low": 0
+      },
+      "license-summary": {
+        "osi-approved": 5,
+        "restricted": 1,
+        "unknown": 0
+      },
+      "data-leaves-boundary": true,
+      "pii-in-training-data": true,
+      "shadow-ai-detected": false
+    },
+
+    "compliance": {
+      "eu-ai-act": {
+        "risk-category": "high",
+        "article-13-satisfied": false,
+        "gaps": [
+          "Training dataset for model-002 contains PII and is not in data governance catalog",
+          "No bias evaluation documented for internal classification model",
+          "No human oversight mechanism documented for automated support routing",
+          "Transparency notice missing — users not informed AI is used in support interactions",
+          "Two external AI API providers process customer data in US — GDPR transfer mechanism not documented"
+        ]
+      },
+      "nist-ai-rmf": {
+        "govern": "partial",
+        "map": "partial",
+        "measure": "not-started",
+        "manage": "not-started",
+        "gaps": [
+          "No AI risk register linked to these components",
+          "No bias evaluation for support-intent-classifier-v3",
+          "No adversarial testing documented",
+          "No incident response plan for AI failures"
+        ]
+      },
+      "iso-42001": {
+        "status": "not-assessed",
+        "gaps": []
+      }
+    },
+
+    "metadata": {
+      "authors": [
+        {
+          "name": "aibomstd-cli",
+          "organization": "Chola AI"
+        }
+      ],
+      "tags": ["customer-support", "production", "eu-ai-act", "gdpr"],
+      "notes": "Reference example for aibomstd spec v0.1. Fictional company Acme Corp. Shows multi-model AI system with embedded models and external API calls. High risk due to PII in training data and data egress to US providers."
+    }
+
+  }
+}

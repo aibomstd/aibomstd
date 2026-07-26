@@ -1,0 +1,278 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aibomstd.com/schema/v0.1/aibomstd.schema.json",
+  "title": "aibomstd",
+  "description": "AI Bill of Materials Standard v0.1 by Chola AI",
+  "type": "object",
+  "required": ["aibomstd"],
+  "additionalProperties": false,
+  "properties": {
+    "aibomstd": {
+      "type": "object",
+      "required": ["specVersion", "schema", "serialNumber", "generated", "tool", "subject", "components", "summary"],
+      "additionalProperties": false,
+      "properties": {
+        "specVersion": { "type": "string", "const": "0.1" },
+        "schema": { "type": "string", "const": "https://aibomstd.com/schema/v0.1/aibomstd.schema.json" },
+        "serialNumber": { "type": "string", "pattern": "^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+        "generated": { "type": "string", "format": "date-time" },
+        "tool": {
+          "type": "object",
+          "required": ["name", "version"],
+          "additionalProperties": false,
+          "properties": {
+            "name": { "type": "string" },
+            "version": { "type": "string" },
+            "vendor": { "type": "string" }
+          }
+        },
+        "subject": {
+          "type": "object",
+          "required": ["name", "type"],
+          "additionalProperties": false,
+          "properties": {
+            "name": { "type": "string" },
+            "version": { "type": "string" },
+            "type": { "type": "string", "enum": ["repository", "container", "directory", "file", "pipeline"] },
+            "source": { "type": "string" },
+            "digest": {
+              "type": "object",
+              "required": ["algorithm", "value"],
+              "additionalProperties": false,
+              "properties": {
+                "algorithm": { "type": "string", "enum": ["sha256", "sha512", "md5"] },
+                "value": { "type": "string" }
+              }
+            }
+          }
+        },
+        "components": { "type": "array", "minItems": 0, "items": { "$ref": "#/$defs/component" } },
+        "summary": { "$ref": "#/$defs/summary" },
+        "compliance": { "$ref": "#/$defs/compliance" },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "authors": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "email": { "type": "string" },
+                  "organization": { "type": "string" }
+                }
+              }
+            },
+            "tags": { "type": "array", "items": { "type": "string" } },
+            "notes": { "type": "string" }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "component": {
+      "type": "object",
+      "required": ["bom-ref", "type", "identity"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": { "type": "string" },
+        "type": { "type": "string", "enum": ["model", "dataset", "framework", "api-client"] },
+        "identity": { "$ref": "#/$defs/identity" },
+        "provenance": { "$ref": "#/$defs/provenance" },
+        "license": { "$ref": "#/$defs/license" },
+        "service": { "$ref": "#/$defs/service" },
+        "properties": {
+          "type": "object",
+          "additionalProperties": { "oneOf": [{ "type": "string" }, { "type": "number" }, { "type": "boolean" }] }
+        },
+        "risks": { "type": "array", "items": { "$ref": "#/$defs/risk" } }
+      }
+    },
+    "identity": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "provider": { "type": "string" },
+        "version": { "type": "string" },
+        "model-id": { "type": "string" },
+        "source": { "type": "string", "enum": ["huggingface", "ollama", "mlflow", "sagemaker", "azure-ml", "pypi", "npm", "dockerhub", "internal", "local-file", "unknown"] },
+        "purl": { "type": "string" },
+        "uri": { "type": "string" },
+        "is-external": { "type": "boolean" },
+        "digest": {
+          "type": "object",
+          "required": ["algorithm", "value"],
+          "additionalProperties": false,
+          "properties": {
+            "algorithm": { "type": "string", "enum": ["sha256", "sha512", "md5", "blake2b"] },
+            "value": { "type": "string" }
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "training-datasets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string" },
+              "uri": { "type": "string" },
+              "verified": { "type": "boolean" },
+              "sensitivity": { "type": "string", "enum": ["public", "internal", "confidential", "PII", "PHI", "unknown"] }
+            }
+          }
+        },
+        "fine-tuned": { "type": "boolean" },
+        "base-model": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": { "type": "string" },
+            "version": { "type": "string" },
+            "provider": { "type": "string" },
+            "model-id": { "type": "string" }
+          }
+        },
+        "trained-by": { "type": "string" },
+        "trained-on": { "type": "string" },
+        "citations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["title"],
+            "additionalProperties": false,
+            "properties": {
+              "title": { "type": "string" },
+              "url": { "type": "string" },
+              "type": { "type": "string", "enum": ["paper", "model-card", "dataset-card", "report", "blog"] },
+              "year": { "type": "integer" }
+            }
+          }
+        }
+      }
+    },
+    "license": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "url": { "type": "string" },
+        "osi-approved": { "type": "boolean" },
+        "risk": { "type": "string", "enum": ["none", "low", "medium", "high", "unknown"] },
+        "commercial-use": { "type": "boolean" },
+        "conditions": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "service": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "endpoint": { "type": "string" },
+        "models-used": { "type": "array", "items": { "type": "string" } },
+        "data-leaves-boundary": { "type": "boolean" },
+        "data-residency": { "type": "string", "enum": ["IN", "US", "EU", "UK", "SG", "AU", "JP", "CA", "BR", "unknown"] },
+        "authenticated": { "type": "boolean" }
+      }
+    },
+    "risk": {
+      "type": "object",
+      "required": ["id", "type", "severity"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^AIBOM-R[0-9]{3,}$" },
+        "type": { "type": "string", "enum": ["license", "data-egress", "provenance", "data-sensitivity", "integrity", "compliance"] },
+        "severity": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+        "description": { "type": "string" },
+        "recommendation": { "type": "string" },
+        "regulation": { "type": "string", "enum": ["EU-AI-ACT", "GDPR", "NIST-AI-RMF", "ISO-42001", "HIPAA", "RBI", "internal"] }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["total-components", "risk-score"],
+      "additionalProperties": false,
+      "properties": {
+        "total-components": { "type": "integer", "minimum": 0 },
+        "by-type": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "model": { "type": "integer", "minimum": 0 },
+            "dataset": { "type": "integer", "minimum": 0 },
+            "framework": { "type": "integer", "minimum": 0 },
+            "api-client": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "risk-score": { "type": "string", "enum": ["none", "low", "medium", "high", "critical"] },
+        "risk-counts": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "critical": { "type": "integer", "minimum": 0 },
+            "high": { "type": "integer", "minimum": 0 },
+            "medium": { "type": "integer", "minimum": 0 },
+            "low": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "license-summary": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "osi-approved": { "type": "integer", "minimum": 0 },
+            "restricted": { "type": "integer", "minimum": 0 },
+            "unknown": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "data-leaves-boundary": { "type": "boolean" },
+        "pii-in-training-data": { "type": "boolean" },
+        "shadow-ai-detected": { "type": "boolean" }
+      }
+    },
+    "compliance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "eu-ai-act": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "risk-category": { "type": "string", "enum": ["minimal", "limited", "high", "unacceptable", "unknown"] },
+            "article-13-satisfied": { "type": "boolean" },
+            "gaps": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "nist-ai-rmf": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "govern": { "type": "string", "enum": ["complete", "partial", "not-started"] },
+            "map": { "type": "string", "enum": ["complete", "partial", "not-started"] },
+            "measure": { "type": "string", "enum": ["complete", "partial", "not-started"] },
+            "manage": { "type": "string", "enum": ["complete", "partial", "not-started"] },
+            "gaps": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "iso-42001": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "status": { "type": "string", "enum": ["compliant", "partial", "not-assessed"] },
+            "gaps": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      }
+    }
+  }
+}

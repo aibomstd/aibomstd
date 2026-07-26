@@ -1,0 +1,35 @@
+# ============================================================
+# FILE 5: CITATION.cff
+# Location: root of repo
+# Action: Create new file
+# ============================================================
+
+cff-version: 1.2.0
+message: "If you use aibomstd in your research
+or tooling, please cite it using this file."
+type: software
+authors:
+  - family-names: Vasudevan
+    given-names: Sriram
+title: "aibomstd: AI Bill of Materials Standard"
+abstract: "A vendor-neutral open standard, SDK,
+and CLI for AI component transparency. Covers
+models, datasets, frameworks, and API clients
+with novel fields including api-client component
+type, data-leaves-boundary flag, and EU AI Act
+compliance gap mapping. Offline and CI-native."
+version: 0.1.0
+date-released: 2026-01-15
+url: "https://aibomstd.com"
+repository-code: "https://github.com/aibomstd/spec"
+license: Apache-2.0
+keywords:
+  - ai-bom
+  - ai-bill-of-materials
+  - ai-governance
+  - eu-ai-act
+  - supply-chain-security
+  - cyclonedx
+  - open-standard
+  - machine-learning
+  - mlsecops
