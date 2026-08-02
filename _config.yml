@@ -1,0 +1,16 @@
+theme: jekyll-theme-minimal
+title: aibomstd
+description: The open standard for AI Bill of Materials
+url: "https://aibomstd.com"
+
+# Make markdown files render as pages
+include:
+  - CONTRIBUTING.md
+  - LICENSE-CLOUD
+  - GOVERNANCE.md
+  - SECURITY.md
+
+# GitHub metadata
+repository: aibomstd/aibomstd
+github:
+  is_project_page: false
