@@ -1,3 +1,4 @@
+from aibomstd import __version__ as _SDK_VERSION
 """
 aibomstd CLI — AI Bill of Materials scanner and validator.
 """
@@ -402,7 +403,7 @@ def build_aibom(
             "generated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "tool": {
                 "name": "aibomstd-cli",
-                "version": "0.1.0",
+                "version": _SDK_VERSION,
                 "vendor": "aibomstd Project"
             },
             "subject": {
@@ -615,8 +616,8 @@ def convert(
 @app.command()
 def version():
     """Show aibomstd version."""
-    from aibomstd import __version__
-    console.print(f"aibomstd {__version__}")
+    console.print(f"aibomstd {_SDK_VERSION}")
+
 
 if __name__ == "__main__":
     app()
