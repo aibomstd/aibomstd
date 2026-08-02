@@ -129,35 +129,16 @@ npx ajv validate -s schema/v0.1/aibomstd.schema.json -d my-product.aibom.json
 
 ## License
 
-aibomstd uses a dual license model — the same proven approach used by
-HashiCorp, Elastic, and GitLab.
-
-### Open source (Apache 2.0)
-
-The following are free to use, modify, distribute, and build on —
-commercially or otherwise — with no restrictions:
-
-| Component | License |
-|-----------|---------|
-| `schema/` — AI BOM standard | Apache 2.0 |
-| `sdk/` — Python SDK | Apache 2.0 |
-| `cli/` — CLI scanner | Apache 2.0 |
-| `ci-plugins/` — GitHub Actions, GitLab CI, Azure DevOps | Apache 2.0 |
+The schema, SDK, CLI, and CI plugins are licensed under **Apache 2.0**
+— free to use, modify, distribute, and build on commercially or
+otherwise, with no restrictions.
 
 **You can adopt aibomstd as your internal standard, build products on
 top of it, integrate it into commercial tools, and contribute back —
 all without asking permission.**
 
-### Commercial (BUSL 1.1)
-
-The `cloud/` directory — the hosted policy engine, compliance report
-generator, drift detection system, certification platform, and
-enrichment database — is licensed under BUSL 1.1.
-
-This means you cannot copy the `cloud/` code and run it as a competing
-hosted SaaS. Everything else is fully open.
-
-See [LICENSE-CLOUD](LICENSE-CLOUD) for full terms.
+Hosted commercial use of aibomstd server-side services requires a
+separate license. See [LICENSE-CLOUD](LICENSE-CLOUD) for terms.
 
 ---
 
