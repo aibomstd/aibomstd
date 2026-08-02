@@ -615,8 +615,8 @@ def convert(
 @app.command()
 def version():
     """Show aibomstd version."""
-    console.print("aibomstd 0.1.0")
-
+    from aibomstd import __version__
+    console.print(f"aibomstd {__version__}")
 
 if __name__ == "__main__":
     app()
