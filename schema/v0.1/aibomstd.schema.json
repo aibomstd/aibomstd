@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://aibomstd.com/schema/v0.1/aibomstd.schema.json",
   "title": "aibomstd",
-  "description": "AI Bill of Materials Standard v0.1 by Chola AI",
+  "description": "AI Bill of Materials Standard v0.1 — aibomstd Project",
   "type": "object",
   "required": ["aibomstd"],
   "additionalProperties": false,
