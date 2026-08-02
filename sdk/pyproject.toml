@@ -9,7 +9,7 @@ description = "AI Bill of Materials Standard — open standard SDK for AI compon
 readme = "README.md"
 license = {text = "Apache-2.0"}
 authors = [
-  {name = "Sriram Vasudevan", email = "hello@aibomstd.com"}
+  {name = "aibomstd Project", email = "aibomstd@gmail.com"}
 ]
 keywords = [
   "ai-bom",
