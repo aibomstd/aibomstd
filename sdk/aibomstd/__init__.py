@@ -1,3 +1,4 @@
+from importlib.metadata import version, PackageNotFoundError
 from .builder import AiBomBuilder
 from .components import (
     ModelComponent,
@@ -15,7 +16,11 @@ from .components import (
     Digest
 )
 
-__version__ = "0.1.0"
+try:
+    __version__ = version("aibomstd")
+except PackageNotFoundError:
+    __version__ = "0.0.0"
+
 __all__ = [
     "AiBomBuilder",
     "ModelComponent",
