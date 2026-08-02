@@ -69,9 +69,6 @@ Auto-detects `data-leaves-boundary` and `data-residency` for every component.
 # Validate a BOM file against the schema
 aibomstd validate my-repo.aibom.json
 
-# Convert from cisco-aibom format
-aibomstd convert cisco-output.json
-
 # Check version
 aibomstd version
 ```
@@ -109,45 +106,12 @@ bom.to_cyclonedx()         # CycloneDX v1.7 JSON
 
 ---
 
-## Output formats
-
-```python
-bom.to_json()        # aibomstd JSON (default)
-bom.to_html()        # self-contained HTML report
-bom.to_cyclonedx()   # CycloneDX v1.7 JSON
-```
-
----
-
-## Convert from cisco-aibom
-
-```python
-from aibomstd.converters.cisco import CiscoConverter
-import json
-
-cisco_output = json.load(open("cisco-scan-result.json"))
-converter = CiscoConverter()
-aibomstd_json = converter.convert(cisco_output)
-print(json.dumps(aibomstd_json, indent=2))
-```
-
----
-
 ## Schema
 
 Every output document references the canonical schema:
 
 ```
 https://aibomstd.com/schema/v0.1/aibomstd.schema.json
-```
-
-Validate any BOM:
-
-```bash
-npx ajv validate \
-  -s https://aibomstd.com/schema/v0.1/aibomstd.schema.json \
-  -d my-repo.aibom.json \
-  --spec=draft2020
 ```
 
 ---
