@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "aibomstd"
-version = "0.1.0"
+version = "0.2.0"
 description = "AI Bill of Materials Standard — open standard SDK for AI component transparency"
 readme = "README.md"
 license = {text = "Apache-2.0"}
