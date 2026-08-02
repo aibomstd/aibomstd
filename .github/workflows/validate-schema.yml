@@ -1,0 +1,38 @@
+name: Validate aibomstd Schema
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install AJV CLI
+        run: npm install -g ajv-cli ajv-formats
+
+      - name: Validate schema is valid JSON
+        run: |
+          python3 -c "
+          import json, sys
+          with open('schema/v0.1/aibomstd.schema.json') as f:
+              json.load(f)
+          print('Schema JSON is valid')
+          "
+
+      - name: Validate example BOM against schema
+        run: |
+          ajv validate \
+            -s schema/v0.1/aibomstd.schema.json \
+            -d examples/customer-support-ai.json \
+            --spec=draft7 \
+            -c ajv-formats
