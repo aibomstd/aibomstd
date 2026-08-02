@@ -34,5 +34,5 @@ jobs:
           ajv validate \
             -s schema/v0.1/aibomstd.schema.json \
             -d examples/customer-support-ai.json \
-            --spec=draft7 \
+            --spec=draft2020 \
             -c ajv-formats
