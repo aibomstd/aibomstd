@@ -37,17 +37,17 @@ inputs:
     default: ''
   
   github-token:
-    description: 'GitHub token for API calls (pass ${{ github.token }} from workflow)'
+    description: 'GitHub token for API calls (pass github.token from the calling workflow)'
     required: false
     default: ''
   
   pr-number:
-    description: 'PR number for commenting (pass ${{ github.event.pull_request.number }} from workflow)'
+    description: 'PR number for commenting (pass the pull request number from the calling workflow)'
     required: false
     default: ''
   
   repository:
-    description: 'Repository name (pass ${{ github.repository }} from workflow)'
+    description: 'Repository name (pass github.repository from the calling workflow)'
     required: false
     default: ''
 
