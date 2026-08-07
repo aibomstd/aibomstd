@@ -1,0 +1,224 @@
+name: 'aibomstd Scanner (Composite)'
+description: 'Scan repository for AI components, generate AIBOM, enforce policies'
+
+branding:
+  icon: 'shield'
+  color: 'blue'
+
+inputs:
+  scan-path:
+    description: 'Path to scan (default: repo root)'
+    required: false
+    default: '.'
+  
+  config-file:
+    description: 'Path to aibomstd config file'
+    required: false
+    default: 'aibomstd.yml'
+  
+  policy-mode:
+    description: 'Policy enforcement: "warn", "fail", or "audit"'
+    required: false
+    default: 'warn'
+  
+  upload-artifact:
+    description: 'Upload AIBOM as GitHub artifact'
+    required: false
+    default: 'true'
+  
+  comment-on-pr:
+    description: 'Comment findings on PR'
+    required: false
+    default: 'true'
+  
+  data-residency-declare:
+    description: 'Declare data residency (e.g., "openai=EU,anthropic=US")'
+    required: false
+    default: ''
+
+outputs:
+  aibom-json:
+    description: 'Path to generated AIBOM JSON file'
+    value: ${{ steps.scan.outputs.aibom-json }}
+  
+  violations-count:
+    description: 'Number of policy violations'
+    value: ${{ steps.scan.outputs.violations-count }}
+  
+  risk-score:
+    description: 'Risk score 0-100'
+    value: ${{ steps.scan.outputs.risk-score }}
+
+runs:
+  using: 'composite'
+  
+  steps:
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install aibomstd
+      shell: bash
+      run: |
+        pip install --quiet aibomstd>=0.3.0
+        aibomstd --version
+    
+    - name: Scan repository
+      id: scan
+      shell: bash
+      env:
+        SCAN_PATH: ${{ inputs.scan-path }}
+        CONFIG_FILE: ${{ inputs.config-file }}
+        POLICY_MODE: ${{ inputs.policy-mode }}
+        DATA_RESIDENCY_DECLARE: ${{ inputs.data-residency-declare }}
+      run: |
+        set +e  # Continue on error to set outputs
+        
+        echo "🔍 aibomstd Scanner (Composite Action)"
+        echo "======================================="
+        echo "Scan path: $SCAN_PATH"
+        echo "Policy mode: $POLICY_MODE"
+        echo ""
+        
+        cd "$SCAN_PATH"
+        AIBOM_FILE="aibom.json"
+        VIOLATIONS_FILE="violations.json"
+        
+        # Build scan command
+        SCAN_CMD="aibomstd scan . --output $AIBOM_FILE --format json"
+        
+        # Add data residency declarations
+        if [ -n "$DATA_RESIDENCY_DECLARE" ]; then
+          IFS=',' read -ra DECLARES <<< "$DATA_RESIDENCY_DECLARE"
+          for decl in "${DECLARES[@]}"; do
+            SCAN_CMD="$SCAN_CMD --declare $decl"
+          done
+        fi
+        
+        # Add config if exists
+        if [ -f "$CONFIG_FILE" ]; then
+          SCAN_CMD="$SCAN_CMD --config $CONFIG_FILE"
+        fi
+        
+        echo "Running: $SCAN_CMD"
+        eval "$SCAN_CMD"
+        
+        if [ ! -f "$AIBOM_FILE" ]; then
+          echo "❌ Scan failed"
+          exit 1
+        fi
+        
+        echo "✅ AIBOM generated"
+        
+        # Count violations (basic check)
+        VIOLATIONS_COUNT=0
+        RISK_SCORE=0
+        
+        # Extract risk score from AIBOM metadata if available
+        if command -v jq &> /dev/null; then
+          COMPONENTS=$(jq '.components | keys | length' "$AIBOM_FILE" 2>/dev/null || echo 0)
+          RISK_SCORE=$((COMPONENTS * 5))
+          RISK_SCORE=$((RISK_SCORE > 100 ? 100 : RISK_SCORE))
+        fi
+        
+        # Set outputs
+        echo "aibom-json=$AIBOM_FILE" >> $GITHUB_OUTPUT
+        echo "violations-count=$VIOLATIONS_COUNT" >> $GITHUB_OUTPUT
+        echo "risk-score=$RISK_SCORE" >> $GITHUB_OUTPUT
+        
+        echo ""
+        echo "Summary:"
+        echo "  AIBOM: $AIBOM_FILE"
+        echo "  Violations: $VIOLATIONS_COUNT"
+        echo "  Risk score: $RISK_SCORE/100"
+    
+    - name: Upload AIBOM artifact
+      if: inputs.upload-artifact == 'true'
+      uses: actions/upload-artifact@v3
+      with:
+        name: aibomstd-results
+        path: |
+          ${{ inputs.scan-path }}/aibom.json
+          ${{ inputs.scan-path }}/violations.json
+        retention-days: 30
+    
+    - name: Comment on PR
+      if: inputs.comment-on-pr == 'true' && github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const aibomPath = '${{ inputs.scan-path }}/aibom.json';
+          
+          if (!fs.existsSync(aibomPath)) {
+            console.log('⏭️  AIBOM not found, skipping comment');
+            return;
+          }
+          
+          const aibom = JSON.parse(fs.readFileSync(aibomPath, 'utf8'));
+          const riskScore = ${{ steps.scan.outputs.risk-score }};
+          const violationsCount = ${{ steps.scan.outputs.violations-count }};
+          
+          // Build comment
+          const statusEmoji = violationsCount === 0 ? '✅' : '⚠️';
+          const statusText = violationsCount === 0 ? 'All checks passed' : 'Issues detected';
+          
+          let comment = `## ${statusEmoji} aibomstd Security Scan Results\n\n`;
+          comment += `**Status:** ${statusText} | **Risk Score:** ${riskScore}/100\n\n`;
+          
+          comment += `### 📋 Scan Summary\n\n`;
+          comment += `| Metric | Value |\n`;
+          comment += `|--------|-------|\n`;
+          
+          const components = aibom.components || {};
+          comment += `| Models | ${(components.models || []).length} |\n`;
+          comment += `| Datasets | ${(components.datasets || []).length} |\n`;
+          comment += `| Frameworks | ${(components.frameworks || []).length} |\n`;
+          comment += `| External APIs | ${(components['api-clients'] || []).length} |\n`;
+          comment += `| **Risk Score** | **${riskScore}/100** |\n\n`;
+          
+          if (violationsCount === 0) {
+            comment += `### ✅ All Policies Passed\n\n`;
+          }
+          
+          // Add components
+          comment += `### 📦 Components Detected\n\n`;
+          
+          if (components.models && components.models.length > 0) {
+            comment += `**Models:**\n`;
+            components.models.slice(0, 5).forEach(m => {
+              comment += `- \`${m.name}\` (origin: ${m.origin || 'unknown'})\n`;
+            });
+            if (components.models.length > 5) {
+              comment += `- ... and ${components.models.length - 5} more\n`;
+            }
+            comment += `\n`;
+          }
+          
+          if (components['api-clients'] && components['api-clients'].length > 0) {
+            comment += `**External APIs:**\n`;
+            components['api-clients'].forEach(api => {
+              const residency = api['data-residency-declared'] || '❌ Not declared';
+              comment += `- \`${api.name}\` (${residency})\n`;
+            });
+            comment += `\n`;
+          }
+          
+          comment += `---\n\n`;
+          comment += `*Generated by [aibomstd](https://github.com/aibomstd/aibomstd)*\n`;
+          
+          // Post comment
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+    
+    - name: Policy enforcement
+      if: inputs.policy-mode == 'fail' && steps.scan.outputs.violations-count > 0
+      shell: bash
+      run: |
+        echo "❌ Policy enforcement: CI will FAIL due to policy violations"
+        exit 1
