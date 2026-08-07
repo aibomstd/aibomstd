@@ -35,6 +35,21 @@ inputs:
     description: 'Declare data residency: e.g., "openai=EU,anthropic=US"'
     required: false
     default: ''
+  
+  github-token:
+    description: 'GitHub token for API calls (pass ${{ github.token }} from workflow)'
+    required: false
+    default: ''
+  
+  pr-number:
+    description: 'PR number for commenting (pass ${{ github.event.pull_request.number }} from workflow)'
+    required: false
+    default: ''
+  
+  repository:
+    description: 'Repository name (pass ${{ github.repository }} from workflow)'
+    required: false
+    default: ''
 
 outputs:
   aibom-json:
@@ -59,6 +74,6 @@ runs:
     UPLOAD_ARTIFACT: ${{ inputs.upload-artifact }}
     COMMENT_ON_PR: ${{ inputs.comment-on-pr }}
     DATA_RESIDENCY_DECLARE: ${{ inputs.data-residency-declare }}
-    GITHUB_TOKEN: ${{ github.token }}
-    GITHUB_PR_NUMBER: ${{ github.event.pull_request.number }}
-    GITHUB_REPO: ${{ github.repository }}
+    GITHUB_TOKEN: ${{ inputs.github-token }}
+    GITHUB_PR_NUMBER: ${{ inputs.pr-number }}
+    GITHUB_REPO: ${{ inputs.repository }}
