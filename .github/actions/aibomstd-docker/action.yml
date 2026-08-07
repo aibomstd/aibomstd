@@ -1,0 +1,64 @@
+name: 'aibomstd Scanner (Docker)'
+description: 'Scan repository for AI components, generate AIBOM, enforce policies'
+
+branding:
+  icon: 'shield'
+  color: 'blue'
+
+inputs:
+  scan-path:
+    description: 'Path to scan (default: repo root)'
+    required: false
+    default: '.'
+  
+  config-file:
+    description: 'Path to aibomstd config file (aibomstd.yml or aibomstd.json)'
+    required: false
+    default: 'aibomstd.yml'
+  
+  policy-mode:
+    description: 'Policy enforcement: "warn" (comment), "fail" (fail CI), "audit" (no action)'
+    required: false
+    default: 'warn'
+  
+  upload-artifact:
+    description: 'Upload AIBOM JSON as GitHub artifact'
+    required: false
+    default: 'true'
+  
+  comment-on-pr:
+    description: 'Comment findings on PR'
+    required: false
+    default: 'true'
+  
+  data-residency-declare:
+    description: 'Declare data residency: e.g., "openai=EU,anthropic=US"'
+    required: false
+    default: ''
+
+outputs:
+  aibom-json:
+    description: 'Path to generated AIBOM JSON file'
+    value: ${{ steps.scan.outputs.aibom-json }}
+  
+  violations-count:
+    description: 'Number of policy violations found'
+    value: ${{ steps.scan.outputs.violations-count }}
+  
+  risk-score:
+    description: 'Overall risk score (0-100)'
+    value: ${{ steps.scan.outputs.risk-score }}
+
+runs:
+  using: 'docker'
+  image: 'docker://aibomstd/scanner:latest'
+  env:
+    SCAN_PATH: ${{ inputs.scan-path }}
+    CONFIG_FILE: ${{ inputs.config-file }}
+    POLICY_MODE: ${{ inputs.policy-mode }}
+    UPLOAD_ARTIFACT: ${{ inputs.upload-artifact }}
+    COMMENT_ON_PR: ${{ inputs.comment-on-pr }}
+    DATA_RESIDENCY_DECLARE: ${{ inputs.data-residency-declare }}
+    GITHUB_TOKEN: ${{ github.token }}
+    GITHUB_PR_NUMBER: ${{ github.event.pull_request.number }}
+    GITHUB_REPO: ${{ github.repository }}
