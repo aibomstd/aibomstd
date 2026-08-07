@@ -26,7 +26,7 @@ jobs:
       
       - name: Run aibomstd scanner (Composite)
         id: aibomstd
-        uses: aibomstd/aibomstd-github-action@composite-latest
+        uses: ./.github/actions/aibomstd-composite
         with:
           scan-path: '.'
           config-file: 'aibomstd.yml'

@@ -12,8 +12,7 @@ RUN pip install --no-cache-dir aibomstd>=0.3.0
 
 # Copy action scripts
 COPY entrypoint.sh /entrypoint.sh
-COPY scripts/format-github.py /scripts/format-github.py
-COPY src/ci-runner.py /src/ci-runner.py
+COPY scripts/ /scripts/
 
 # Make executable
 RUN chmod +x /entrypoint.sh

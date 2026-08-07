@@ -62,7 +62,7 @@ echo ""
 # Step 2: Run policy validation
 echo "📍 Step 2: Validating policies..."
 
-python3 /src/ci-runner.py \
+python3 /scripts/ci_runner.py \
   --aibom "$AIBOM_FILE" \
   --config "$CONFIG_FILE" \
   --output-violations "$VIOLATIONS_FILE" \
@@ -85,7 +85,7 @@ echo ""
 # Step 3: Format GitHub output
 echo "📍 Step 3: Formatting GitHub output..."
 
-python3 /scripts/format-github.py \
+python3 /scripts/format_github.py \
   --aibom "$AIBOM_FILE" \
   --violations "$VIOLATIONS_FILE" \
   --output-comment "$PR_COMMENT_FILE" \
