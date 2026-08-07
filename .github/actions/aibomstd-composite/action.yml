@@ -62,7 +62,7 @@ runs:
       shell: bash
       run: |
         pip install --quiet aibomstd>=0.3.0
-        aibomstd --version
+        aibomstd version
     
     - name: Scan repository
       id: scan
