@@ -66,7 +66,7 @@ outputs:
 
 runs:
   using: 'docker'
-  image: 'docker://aibomstd/scanner:latest'
+  image: 'Dockerfile'
   env:
     SCAN_PATH: ${{ inputs.scan-path }}
     CONFIG_FILE: ${{ inputs.config-file }}
