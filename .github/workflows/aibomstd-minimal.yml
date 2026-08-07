@@ -1,0 +1,36 @@
+name: aibomstd Scan (Minimal)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install aibomstd
+        run: pip install aibomstd
+
+      - name: Show aibomstd version
+        run: aibomstd version
+
+      - name: Run scan
+        run: aibomstd scan . --output aibom.json
+
+      - name: Show results
+        run: cat aibom.json
+
+      - name: Upload AIBOM as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: aibom-result
+          path: aibom.json
