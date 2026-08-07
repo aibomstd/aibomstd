@@ -37,6 +37,9 @@ jobs:
           upload-artifact: 'true'
           comment-on-pr: 'true'
           data-residency-declare: 'openai=EU,anthropic=US'
+          github-token: ${{ github.token }}
+          pr-number: ${{ github.event.pull_request.number }}
+          repository: ${{ github.repository }}
       
       - name: Check results
         shell: bash
