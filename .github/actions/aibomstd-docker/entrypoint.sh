@@ -15,7 +15,7 @@ COMMENT_ON_PR="${COMMENT_ON_PR:-true}"
 DATA_RESIDENCY_DECLARE="${DATA_RESIDENCY_DECLARE:-}"
 
 # Outputs
-AIBOM_FILE="/tmp/aibom.json"
+AIBOM_FILE="aibom.json"
 VIOLATIONS_FILE="/tmp/violations.json"
 PR_COMMENT_FILE="/tmp/pr-comment.md"
 
