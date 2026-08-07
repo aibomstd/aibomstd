@@ -1,0 +1,61 @@
+name: 'aibomstd Scan (Docker)'
+
+on:
+  pull_request:
+    paths:
+      - '**.py'
+      - '**.txt'
+      - 'requirements.txt'
+      - 'pyproject.toml'
+      - '.github/workflows/aibomstd-docker.yml'
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  aibomstd-scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      checks: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Run aibomstd scanner (Docker)
+        id: aibomstd
+        uses: aibomstd/aibomstd-github-action@docker-latest
+        with:
+          scan-path: '.'
+          config-file: 'aibomstd.yml'
+          policy-mode: 'warn'  # 'warn', 'fail', or 'audit'
+          upload-artifact: 'true'
+          comment-on-pr: 'true'
+          data-residency-declare: 'openai=EU,anthropic=US'
+      
+      - name: Check results
+        shell: bash
+        run: |
+          echo "AIBOM file: ${{ steps.aibomstd.outputs.aibom-json }}"
+          echo "Violations: ${{ steps.aibomstd.outputs.violations-count }}"
+          echo "Risk score: ${{ steps.aibomstd.outputs.risk-score }}/100"
+      
+      - name: Fail if high risk
+        if: steps.aibomstd.outputs.risk-score > 75
+        shell: bash
+        run: |
+          echo "❌ Risk score too high: ${{ steps.aibomstd.outputs.risk-score }}/100"
+          exit 1
+      
+      - name: Archive scan results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: aibomstd-scan-results-docker
+          path: aibom.json
+          retention-days: 90
