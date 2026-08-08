@@ -1,0 +1,55 @@
+name: 'aibomstd Scan'
+description: 'Scan a repository for AI components and generate an AI Bill of Materials (AIBOM)'
+
+branding:
+  icon: 'shield'
+  color: 'blue'
+
+inputs:
+  scan-path:
+    description: 'Path to scan'
+    required: false
+    default: '.'
+  output-file:
+    description: 'Output file name for the generated AIBOM'
+    required: false
+    default: 'aibom.json'
+
+outputs:
+  aibom-file:
+    description: 'Path to the generated AIBOM JSON file'
+    value: ${{ steps.scan.outputs.aibom-file }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install aibomstd
+      shell: bash
+      run: pip install aibomstd
+
+    - name: Show aibomstd version
+      shell: bash
+      run: aibomstd version
+
+    - name: Run scan
+      id: scan
+      shell: bash
+      run: |
+        cd "${{ inputs.scan-path }}"
+        aibomstd scan . --output "${{ inputs.output-file }}"
+        echo "aibom-file=${{ inputs.scan-path }}/${{ inputs.output-file }}" >> "$GITHUB_OUTPUT"
+
+    - name: Show results
+      shell: bash
+      run: cat "${{ inputs.scan-path }}/${{ inputs.output-file }}"
+
+    - name: Upload AIBOM as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: aibom-result
+        path: ${{ inputs.scan-path }}/${{ inputs.output-file }}
