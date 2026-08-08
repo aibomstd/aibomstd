@@ -114,6 +114,10 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+  pull-requests: write   # required for PR comments
+
 jobs:
   scan:
     runs-on: ubuntu-latest
@@ -137,6 +141,7 @@ jobs:
 |-------|-------------|----------|---------|
 | `scan-path` | Path to scan | No | `.` |
 | `output-file` | Output file name for the generated AIBOM | No | `aibom.json` |
+| `comment-on-pr` | Post scan results as a pull request comment | No | `true` |
 
 **Outputs:**
 
@@ -144,7 +149,9 @@ jobs:
 |--------|-------------|
 | `aibom-file` | Path to the generated AIBOM JSON file |
 
-Pin to `@v1` for stability, or `@v1.0.0` for an exact release. Avoid `@main`.
+**PR comments:** when running on a pull request, the action posts a component-count summary as a PR comment (and updates it on subsequent pushes, rather than posting duplicates). This requires the calling workflow to grant `pull-requests: write` — see the `permissions:` block above. If that permission isn't granted, the comment step is silently skipped and the rest of the scan still completes normally.
+
+Pin to `@v1` for stability, or `@v1.0.0` / `@v1.1.0` for an exact release. Avoid `@main`.
 
 GitLab CI and Azure DevOps support are planned.
 
