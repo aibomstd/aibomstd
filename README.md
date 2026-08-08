@@ -103,15 +103,50 @@ aibomstd export --format cyclonedx my-product.aibom.json
 
 ## CI/CD integration
 
+### GitHub Action
+
 ```yaml
 # .github/workflows/aibom.yml
-- name: Generate AI BOM
-  uses: aibomstd/aibomstd-action@v1
-  with:
-    output: aibom.json
+name: AI Bill of Materials Scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run aibomstd Scan
+        id: aibomstd
+        uses: aibomstd/aibomstd@v1
+        with:
+          scan-path: '.'
+          output-file: 'aibom.json'
+
+      - name: Show AIBOM path
+        run: echo "AIBOM generated at ${{ steps.aibomstd.outputs.aibom-file }}"
 ```
 
-Works with GitHub Actions, GitLab CI, and Azure DevOps.
+**Inputs:**
+
+| Input | Description | Required | Default |
+|-------|-------------|----------|---------|
+| `scan-path` | Path to scan | No | `.` |
+| `output-file` | Output file name for the generated AIBOM | No | `aibom.json` |
+
+**Outputs:**
+
+| Output | Description |
+|--------|-------------|
+| `aibom-file` | Path to the generated AIBOM JSON file |
+
+Pin to `@v1` for stability, or `@v1.0.0` for an exact release. Avoid `@main`.
+
+GitLab CI and Azure DevOps support are planned.
 
 ---
 
